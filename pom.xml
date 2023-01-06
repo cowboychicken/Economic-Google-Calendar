@@ -32,13 +32,11 @@
       <artifactId>exec-maven-plugin</artifactId>
       <version>1.2.1</version>
       <configuration>
-        <mainClass>com.mycompany.app.CalendarQuickstart</mainClass>
-        
+        <mainClass>com.mycompany.app.WebPageScraper</mainClass>    
         <arguments>
             <argument>Delete_All</argument>
             <argument>a2f405442fb6c4687738183931cbe0fa188d41fd0e60d0c021f544f51b639dc9@group.calendar.google.com</argument>
         </arguments>
-      
     </configuration>
   </plugin>
   </plugins>

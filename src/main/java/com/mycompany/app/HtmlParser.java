@@ -6,6 +6,11 @@ import com.gargoylesoftware.htmlunit.html.HtmlBold;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
+import com.gargoylesoftware.htmlunit.html.HtmlTableHeaderCell;
+import com.gargoylesoftware.htmlunit.html.HtmlTable;
+import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
+import com.gargoylesoftware.htmlunit.html.HtmlTableHeader;
+import com.gargoylesoftware.htmlunit.html.HtmlTableBody;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -16,112 +21,84 @@ import java.time.Year;
 
 public class HtmlParser{
 
+    private ArrayList <String> EventDescriptionFilter = 
+        new ArrayList<String>(
+            Arrays.asList(
+                "FOMC Statement",
+                "for",
+                "Geeks"
+            ));
+
     public HtmlParser(){};
 
-    public ArrayList<String> getEvents (HtmlPage inputPage ){
-        
-        List<HtmlElement> elementsByTag = inputPage.getByXPath("//tr");
-        ArrayList<String> events = new ArrayList<String>();
+        public ArrayList<String> getEvents2 (HtmlPage page1 ){
+            ArrayList<String> events = new ArrayList<String>();
 
-        if (elementsByTag.isEmpty()) {
-            System.out.println("No elements found!");
-        } 
-        else {}
-            String dateToAdd = "";  
+            HtmlTable table = page1.getHtmlElementById("calendar");
+
+            HtmlTableHeader tHeader = table.getHeader();
     
-            int dateCount = 0;
-            int eventCount = 0;
-
-            for (HtmlElement element : elementsByTag) {
-
-                System.out.println(element.asXml());
-          
-                // Check if DATE containing row
-                HtmlBold dateBold = (HtmlBold) element.getFirstByXPath(".//b");
-
-                try {
-                    
-                    dateToAdd = dateBold.getTextContent();
-                    dateCount ++;
-                    System.out.println("not null");
-
-                } catch (NullPointerException e) {
-
-                    // If there is no date, then treat as an event 
-                    System.out.println("----- null");
-                    HtmlTableCell eventTime = (HtmlTableCell) element.getFirstByXPath(".//td");
-                    System.out.println("----- null1");
-                    HtmlTableCell eventTitle = (HtmlTableCell) element.getFirstByXPath(".//td[2]");
-                    System.out.println("----- null2");
-
-                    String eventTimeStr = "";
-                    String eventTitleStr = "";
-                    try {
-                          eventTimeStr = eventTime.getTextContent();
-                          eventTitleStr = eventTitle.getTextContent(); 
-                          System.out.println("date to add   " + dateToAdd );
-                          //If event exist
-                      
-                          // Testing
-                          //  System.out.println(eventTime.getTextContent());
-                          System.out.println("----- null3");
-                          //System.out.println(eventTitle.getTextContent());
+            // Gets dates with duplicates within TH
+            List <HtmlTableBody> tableBodies = table.getBodies();
+            List<HtmlTableHeaderCell> tableHeaders = table.getByXPath("//thead//tr//th[1]");
       
-      
-                      //    String[] addedEventDetails = addedEvent.split("[,]");
-                          
-                          String year = Integer.toString(Year.now().getValue());
-      //                    String month = enummonths(addedEventDetails[1].substring(0,addedEventDetails[1].indexOf(".")).trim());
-                          String month = enummonths(dateToAdd.substring(dateToAdd.indexOf(",")+1,dateToAdd.indexOf(".")).trim());
-                        //  System.out.println("month value befor passing : "+addedEventDetails[1].substring(0,addedEventDetails[1].indexOf(".")).trim() );
-                         // String day = String.format("%02d",  Integer.parseInt(addedEventDetails[1].substring(addedEventDetails[1].indexOf('.')+1,addedEventDetails[1].length()).trim()));
-                          
-                          String day = String.format("%02d", Integer.parseInt(dateToAdd.substring(dateToAdd.indexOf(".")+1,dateToAdd.length()).trim())  );
-      
-                          String details = eventTitleStr;
-                         // System.out.println("\tdetails  " + details+ " time  : " +addedEventDetails[2]);
-                          
-                          String startTime = "";
-                          
-                          if (eventTimeStr.indexOf(" ")<0 || details.contains("holiday") ) startTime ="8 am";
-                          else startTime = eventTimeStr;
-                          startTime = convertTime(startTime);
-                          
-              
-                       //   System.out.println("_" + addedEventDetails[1].substring(0,addedEventDetails[1].indexOf(".")) + "_");
-                       //   System.out.println("_" + addedEventDetails[1] + "_");
-                          System.out.println("\tYear " + year + "\tMonth " + month + "\tday" + day + "\tstarttime" + startTime + "\tdetails " + details);
-                          
-                       // eventCount ++;
+            int j = 0;
+            for (int i = 0; i < tableBodies.size(); i++) {
+    
+                String[] date = tableHeaders.get(j).asNormalizedText().split(" ");
 
-                       events.add(
+                List<HtmlTableRow>  tableRows = tableBodies.get(i).getRows();
+    
+                for (HtmlTableRow tableRow : tableRows ){
+    
+                    String level = tableRow.getCell(0).asXml();
+                    level = level.substring(level.indexOf("calendar-date-")+14, level.indexOf("calendar-date-")+15);
+                    String time = tableRow.getCell(0).asNormalizedText();
+                    String details = tableRow.getCell(2).asNormalizedText();
+
+                    String year = date[3];
+                    String month = enummonths(date[1].toUpperCase());
+                    String day = date[2];
+                    String startTime="";
+
+                    if (time.indexOf(":")<0 || details.contains("holiday") ) {
+                        time ="08:00 PM";
+                        level = "1";    // level is stored in class attribute of time. so no time, no level
+                    }
+                    time = convertTime(time);
+    
+                    System.out.println("date" + date + "\tlevel: " + level + "\ttime: " + time + "\tdetails: " + details);
+                    System.out.println("year: " + year + "\tmonth: " + month + "\tdate: " + day + "\tlevel: " + level + "\ttime: " + startTime + "\tdetails: " + details);
+
+                    events.add(
                         year + "," +
                         month + "," +
                         day + "," +
-                        startTime + "," +
-                        details 
+                        time + "," +
+                        details + "," +
+                        level
                       
                     );
-                    eventCount ++;
-
-                    } catch (NullPointerException f) {
-                        f.printStackTrace();
-                    }
                 }
+                j = j + 2;
             }
             return events;
         }
 
 
+
+
         
-  private static String convertTime (String input){
+  private static String convertTime (String input ){
     System.out.println("input convertime =  " + input);
 
     int outputHours = 0;
     int outputMins = 0;
 
+    // millitary time
     if (input.contains("pm")) outputHours += 12;
 
+    // cut off am/pm
     input = input.substring(0,input.indexOf(" "));
 
     if (input.indexOf(':') > 0){
@@ -130,7 +107,7 @@ public class HtmlParser{
     } 
     else outputHours += Integer.parseInt(input);
 
-    return String.format("%02d:%02d", outputHours+6-1, outputMins);
+    return String.format("%02d:%02d", outputHours + 12, outputMins);
 
   }
 
@@ -148,6 +125,18 @@ public class HtmlParser{
     else if (abrv.equals("OCT")) return "10";
     else if (abrv.equals("NOV")) return "11";
     else if (abrv.equals("DEC")) return "12";
+    else if (abrv.equals("JANUARY")) return "01";
+    else if (abrv.equals("FEBRUARY")) return "02";
+    else if (abrv.equals("MARCH")) return "03";
+    else if (abrv.equals("APRIL")) return "04";
+    else if (abrv.equals("MAY")) return "05";
+    else if (abrv.equals("JUNE")) return "06";
+    else if (abrv.equals("JULY")) return "07";
+    else if (abrv.equals("AUGUST")) return "08";
+    else if (abrv.equals("SEPTEMBER")) return "09";
+    else if (abrv.equals("OCTOBER")) return "10";
+    else if (abrv.equals("NOVEMBER")) return "11";
+    else if (abrv.equals("DECEMBER")) return "12";
     else return "00";
 
 

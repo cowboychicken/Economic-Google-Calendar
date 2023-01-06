@@ -1,22 +1,14 @@
-How to organize scraping program.....
+Website that is scraped:
+https://tradingeconomics.com/united-states/calendar
 
+Must download and place OAuth credentials file in 'resource' folder. Also delete tokens file if security scope is ever changed.
 
+Commands to build and run:
+mvn clean package -DskipTests
+java -cp target/my-app-1.0-SNAPSHOT.jar com.mycompany.app.App
 
 ----
-General proccess 
 
-capture contents of website 
+To do:
+	- Add functions to build out reminders and include when adding new events.
 
-
-parse contents specific to this project
-*Format specificly for this project to CSV
-
-Write contents to CSV
-*Format specifically for this project 
-Add events not already in CSV to calendar   
-
-	* Could probably consolidate these steps to the earlier step. 
-		Adding events to the callendar should be abstract. 
-		
-
----
