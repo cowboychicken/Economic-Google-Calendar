@@ -91,8 +91,6 @@ public class OpenCsv {
         }
     }
 
-
-
     private static ArrayList<String> List2ArrayList(List<String[]> input){
         ArrayList<String> output = new ArrayList<String>();
 

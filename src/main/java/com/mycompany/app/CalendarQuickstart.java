@@ -93,14 +93,14 @@ public class CalendarQuickstart {
         }
     }
 
-    public CalendarQuickstart(String calendarID) throws IOException, GeneralSecurityException {
+    public CalendarQuickstart(String calendarIdInput) throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         service =
             new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
-        CalendarID = calendarID;
+        CalendarID = calendarIdInput;
     }
 
 
@@ -128,20 +128,20 @@ public class CalendarQuickstart {
 
     public static void clearAllCalendarEvents(){
         try {
-            // Iterate over the events in the specified calendar
-     System.out.println("YO-1111");
+      
+            System.out.println("YO-1111");
             
-                Events events = service.events().list(CalendarID).setPageToken(null).execute();
-                System.out.println("YO-1112");
-                List<Event> items = events.getItems();
-                System.out.println("YO-11113");
-                for (Event event : items) {
-                    System.out.println("Deleting...\ttitle:\t" + event.getSummary() + "id:\t" + event.getId());
-                    service.events().delete(CalendarID, event.getId() ).execute();
-                }
+            Events events = service.events().list(CalendarID).setPageToken(null).execute();
+            System.out.println("YO-1112  events.summary:   " + events.getSummary() + " " + events.getItems().size() + " " + events.getAccessRole() +" " + events.getKind());
 
-
-        
+            List<Event> eventItems = events.getItems();
+            
+            
+            System.out.println("YO-11113  size of items:  " + eventItems.size());
+            for (Event event : eventItems) {
+                System.out.println("Deleting...\ttitle:\t" + event.getSummary() + "id:\t" + event.getId());
+                service.events().delete(CalendarID, event.getId() ).execute();
+            }
         } catch (IOException e){
             e.printStackTrace();
         }
