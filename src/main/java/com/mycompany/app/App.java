@@ -33,8 +33,7 @@ import java.time.Year;
 public class App {
 
   public static void main(String[] args) {
-    System.out.println("\nStarting...");
-
+    System.out.println("\n[] Starting...");
     String calendarId = "a2f405442fb6c4687738183931cbe0fa188d41fd0e60d0c021f544f51b639dc9@group.calendar.google.com";
     String siteUrl = "https://www.marketwatch.com/economy-politics/calendar";
     String siteUrl2 = "https://tradingeconomics.com/united-states/calendar";
@@ -48,27 +47,21 @@ public class App {
       ArrayList<String> scrapedEvents = new HtmlParser().getEvents2(marketWatchCalendarScraper.scrapePage(siteUrl2));
       
         // Print out events that have been scraped
-        System.out.println("\n\nEvents Scraped:\n\n" + scrapedEvents.size());
-        for (String scrapeditem : scrapedEvents){
-          System.out.println (scrapeditem);
-        }
+        System.out.println("\n[] Events Scraped: " + scrapedEvents.size());
 
         // Update CSV with new events
         OpenCsv openCsvObj = new OpenCsv();
         openCsvObj.fileLocation = csvFileLocation;
         ArrayList<String> addedEvents = new ArrayList<String>(openCsvObj.updateCsv(scrapedEvents));
-
+        
+        CalendarQuickstart calobj = new CalendarQuickstart(calendarId);
         if (addedEvents.isEmpty()){
-          System.out.println("No events added");
+          System.out.println("\n[] No events added");
         }
         else {
-          CalendarQuickstart calobj = new CalendarQuickstart(calendarId);
-         // calobj.printListOfEvents(10);
-          calobj.clearAllCalendarEvents();
- 
           for (String addedEvent : addedEvents){
             String[] addedEventDetails = addedEvent.split("[,]");
-            if (addedEventDetails[5].equals("3"))
+            if (addedEventDetails[5].equals("3")){
               calobj.addCalendarEvent(
                 addedEventDetails[0] + "-" +  // year
                 addedEventDetails[1] + "-" +  // month
@@ -80,16 +73,15 @@ public class App {
                 addedEventDetails[3] + ":05.000-00:00",
                 addedEventDetails[4]   // details
                 );
+            }
           }
 
-         
-          calobj.printListOfEvents(10);
         }
     } catch (IOException e) {
       e.printStackTrace();
     } catch (GeneralSecurityException f) {
       f.printStackTrace();
     };
-    System.out.println("\nEnding...\n");
+    System.out.println("\n[] Ending...\n");
   }
 }

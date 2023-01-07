@@ -84,10 +84,8 @@ public class CalendarQuickstart {
     public static void main(String[] args) throws IOException, GeneralSecurityException{
 
         CalendarQuickstart tmp = new    CalendarQuickstart(args[1]);
-        System.out.println("YOO-0");
         if (args[0].equals("Delete_All")){
             // Meant for running from CMD line
-            System.out.println("YOO1 tmp.ID " );
                 tmp.clearAllCalendarEvents();
                 System.out.println("YOO2");
         }
@@ -121,27 +119,23 @@ public class CalendarQuickstart {
         Event eventToAdd = new Event().setDescription("").setSummary(Title)
             .setStart(eventtoaddstart).setEnd(eventtoaddend);
         service.events().insert(CalendarID , eventToAdd).execute();
-        System.out.println("Event Added");
     }
 
 
 
     public static void clearAllCalendarEvents(){
         try {
-      
-            System.out.println("YO-1111");
-            
-            Events events = service.events().list(CalendarID).setPageToken(null).execute();
-            System.out.println("YO-1112  events.summary:   " + events.getSummary() + " " + events.getItems().size() + " " + events.getAccessRole() +" " + events.getKind());
+            String pageToken = null;
+            do {
+                Events events = service.events().list(CalendarID).setPageToken(pageToken).execute();
+                List<Event> items = events.getItems();
+                for (Event event : items) {
+                    service.events().delete(CalendarID, event.getId() ).execute();
+                    System.out.println("Deleting...\ttitle:\t" + event.getSummary() + "id:\t" + event.getId());
+                }
+                pageToken = events.getNextPageToken();
+            } while (pageToken != null);
 
-            List<Event> eventItems = events.getItems();
-            
-            
-            System.out.println("YO-11113  size of items:  " + eventItems.size());
-            for (Event event : eventItems) {
-                System.out.println("Deleting...\ttitle:\t" + event.getSummary() + "id:\t" + event.getId());
-                service.events().delete(CalendarID, event.getId() ).execute();
-            }
         } catch (IOException e){
             e.printStackTrace();
         }
@@ -158,11 +152,9 @@ public class CalendarQuickstart {
         List<Event> listItems = events.getItems();
         if (listItems.isEmpty()) System.out.println("No events found.");
         else {
-            System.out.println("Upcoming events");
             for (Event event : listItems) {
                 DateTime start = event.getStart().getDateTime();
                 if (start == null) start = event.getStart().getDate();
-                System.out.printf("%s (%s)\n", event.getSummary(), start);
             }
         }
     }
