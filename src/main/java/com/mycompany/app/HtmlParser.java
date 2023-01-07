@@ -21,14 +21,6 @@ import java.time.Year;
 
 public class HtmlParser{
 
-    private ArrayList <String> EventDescriptionFilter = 
-        new ArrayList<String>(
-            Arrays.asList(
-                "FOMC Statement",
-                "for",
-                "Geeks"
-            ));
-
     public HtmlParser(){};
 
         public ArrayList<String> getEvents2 (HtmlPage page1 ){
@@ -66,9 +58,6 @@ public class HtmlParser{
                         level = "1";    // level is stored in class attribute of time. so no time, no level
                     }
                     time = convertTime(time);
-    
-                    System.out.println("date" + date + "\tlevel: " + level + "\ttime: " + time + "\tdetails: " + details);
-                    System.out.println("year: " + year + "\tmonth: " + month + "\tdate: " + day + "\tlevel: " + level + "\ttime: " + startTime + "\tdetails: " + details);
 
                     events.add(
                         year + "," +
@@ -84,13 +73,8 @@ public class HtmlParser{
             }
             return events;
         }
-
-
-
-
         
   private static String convertTime (String input ){
-    System.out.println("input convertime =  " + input);
 
     int outputHours = 0;
     int outputMins = 0;
@@ -138,14 +122,7 @@ public class HtmlParser{
     else if (abrv.equals("NOVEMBER")) return "11";
     else if (abrv.equals("DECEMBER")) return "12";
     else return "00";
-
-
-
   }
-  
-
-
-
     }
 
 
