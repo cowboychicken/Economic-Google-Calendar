@@ -5,10 +5,13 @@ Must download and place OAuth credentials file in 'resource' folder. Also delete
 
 Commands to build and run:
 mvn clean package -DskipTests
+
 java -cp target/my-app-1.0-SNAPSHOT.jar com.mycompany.app.App
+
+// Pass in "Redo_All" with the above to clear calendar and place all events from current CSV
 
 ----
 
 To do:
-	- Add functions to build out reminders and include when adding new events.
+
 

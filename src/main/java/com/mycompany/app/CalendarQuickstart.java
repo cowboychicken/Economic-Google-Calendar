@@ -78,18 +78,8 @@ public class CalendarQuickstart {
         return credential;
     }
 
-    public static Calendar service;
+    private static Calendar service;
     private static String CalendarID = "";
-
-    public static void main(String[] args) throws IOException, GeneralSecurityException{
-
-        CalendarQuickstart tmp = new    CalendarQuickstart(args[1]);
-        if (args[0].equals("Delete_All")){
-            // Meant for running from CMD line
-                tmp.clearAllCalendarEvents();
-                System.out.println("YOO2");
-        }
-    }
 
     public CalendarQuickstart(String calendarIdInput) throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
@@ -101,16 +91,14 @@ public class CalendarQuickstart {
         CalendarID = calendarIdInput;
     }
 
-
-
-    public static void printCalendarIds() throws IOException {
+    public void printCalendarIds() throws IOException {
         CalendarList calendars = service.calendarList().list().execute();
         List <CalendarListEntry> listEntries = calendars.getItems();
         if (listEntries.isEmpty()) System.out.println("No ids found.");
         else for (CalendarListEntry entry : listEntries) System.out.println("\t" + entry.getSummary() + "\t" + entry.getId());
     }
 
-    public static void addCalendarEvent(String startDateAndTime, String endDateAndTime, String Title) throws IOException{
+    public void addCalendarEvent(String startDateAndTime, String endDateAndTime, String Title) throws IOException{
         // Add new event
         // time format is YYYY-MM-DDThh:mm:00.000-00:00
         // 6 hours ahead of CT ex: "2023-01-07T15:30:00.000-00:00" == 9:30am
@@ -121,9 +109,7 @@ public class CalendarQuickstart {
         service.events().insert(CalendarID , eventToAdd).execute();
     }
 
-
-
-    public static void clearAllCalendarEvents(){
+    public void clearAllCalendarEvents(){
         try {
             String pageToken = null;
             do {
@@ -141,7 +127,7 @@ public class CalendarQuickstart {
         }
     }
 
-    public static void printListOfEvents (int n) throws IOException{
+    public void printListOfEvents (int n) throws IOException{
         DateTime now = new DateTime(System.currentTimeMillis());
         Events events = service.events().list(CalendarID)
             .setMaxResults(n)

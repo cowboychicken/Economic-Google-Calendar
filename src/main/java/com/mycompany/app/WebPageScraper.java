@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class WebPageScraper{
 
-    private static WebClient client;
+    private WebClient client;
 
     public WebPageScraper(){
         // Open Browser
@@ -19,6 +19,5 @@ public class WebPageScraper{
     public HtmlPage scrapePage (String siteUrl) throws IOException{
         return client.getPage(siteUrl);
     }
-
 
 }
