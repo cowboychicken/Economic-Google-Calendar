@@ -16,9 +16,13 @@ import java.util.Collections;
 
 public class OpenCsv {
 
-    public static String fileLocation;
+    private String fileLocation;
 
-    public static ArrayList<String> updateCsv(ArrayList<String> input){
+    public OpenCsv (String filePath){
+        fileLocation = filePath;
+    }
+
+    public ArrayList<String> updateCsv(ArrayList<String> input){
         ArrayList<String> newEvents = new ArrayList<String>();
         File f = new File(fileLocation);
         if(!f.exists()) writeToCsv(newEvents);
@@ -33,14 +37,14 @@ public class OpenCsv {
                 for(String entry1 : input) newEvents.add(entry1);
             }
             System.out.println("\n[] # of events not already in file: " + newEvents.size());
-            if(!newEvents.isEmpty()) writeToCsv(newEvents);
+           // if(!newEvents.isEmpty()) writeToCsv(newEvents);
         }
         
         return newEvents;
     }
 
 
-    public static int writeToCsv(ArrayList<String> input){
+    public int writeToCsv(ArrayList<String> input){
         try (CSVWriter writer = new CSVWriter(new FileWriter(fileLocation,true))) {
             for(String element:input) writer.writeNext( element.split("[,]"));
             
@@ -53,9 +57,7 @@ public class OpenCsv {
         return 1;
     }
 
-
-
-    public static ArrayList<String> readCsv(){
+    public ArrayList<String> readCsv(){
         
         try (CSVReader reader = new CSVReader(new FileReader(fileLocation))) {
             List<String[]> tmpList = reader.readAll();
@@ -79,7 +81,7 @@ public class OpenCsv {
         }
     }
 
-    private static ArrayList<String> List2ArrayList(List<String[]> input){
+    private ArrayList<String> List2ArrayList(List<String[]> input){
         ArrayList<String> output = new ArrayList<String>();
         for (String[] array : input){
             String tmpstr = "";

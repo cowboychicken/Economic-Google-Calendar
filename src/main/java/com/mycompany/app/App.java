@@ -20,68 +20,84 @@ import java.util.List;
 import java.util.Vector;
 import java.time.Year;
 
-/*
-    To Do
-    Fix time adjustment
-
-  - figure out how to capture 'year' 
-      might not be issue... only for week before new year, but would just create entries for previou january until new year rolls around
-  - Make it so, just incase writing to CSV fails or Calendar fails, we don't have to edit text files again. 
-    Maybe, do one at a time. (add to calendar, if it works, then write CSV )
-*/
-
 public class App {
 
   public static void main(String[] args) {
+
     System.out.println("\n[] Starting...");
     String calendarId = "a2f405442fb6c4687738183931cbe0fa188d41fd0e60d0c021f544f51b639dc9@group.calendar.google.com";
-    String siteUrl = "https://www.marketwatch.com/economy-politics/calendar";
     String siteUrl2 = "https://tradingeconomics.com/united-states/calendar";
     String csvFileLocation = "C:\\Users\\user\\Documents\\testmaven3\\my-app\\src\\main\\resources\\EconomicCalendarEvents.csv";
 
-    // Go to page
     try {
-    
-      WebPageScraper marketWatchCalendarScraper = new WebPageScraper();
-      //ArrayList<String> scrapedEvents = new HtmlParser().getEvents(marketWatchCalendarScraper.scrapePage(siteUrl));
-      ArrayList<String> scrapedEvents = new HtmlParser().getEvents2(marketWatchCalendarScraper.scrapePage(siteUrl2));
-      
+      OpenCsv openCsvObj = new OpenCsv(csvFileLocation);
+      CalendarQuickstart calobj = new CalendarQuickstart(calendarId);
+
+      if (args.length == 0) {
+        // Go to webpage
+        WebPageScraper marketWatchCalendarScraper = new WebPageScraper();
+        ArrayList<String> scrapedEvents = new HtmlParser().getEvents2(marketWatchCalendarScraper.scrapePage(siteUrl2));
+
         // Print out events that have been scraped
         System.out.println("\n[] Events Scraped: " + scrapedEvents.size());
 
-        // Update CSV with new events
-        OpenCsv openCsvObj = new OpenCsv();
-        openCsvObj.fileLocation = csvFileLocation;
-        ArrayList<String> addedEvents = new ArrayList<String>(openCsvObj.updateCsv(scrapedEvents));
-        
-        CalendarQuickstart calobj = new CalendarQuickstart(calendarId);
-        if (addedEvents.isEmpty()){
+        // Compare current CSV with new events
+        ArrayList<String> newEvents = new ArrayList<String>(openCsvObj.updateCsv(scrapedEvents));
+
+        if (newEvents.isEmpty()) {
           System.out.println("\n[] No events added");
-        }
-        else {
-          for (String addedEvent : addedEvents){
+        } else {
+          // Add new events to calendar
+          for (String addedEvent : newEvents) {
             String[] addedEventDetails = addedEvent.split("[,]");
-            if (addedEventDetails[5].equals("3")){
+            if (addedEventDetails[5].equals("3")) {
               calobj.addCalendarEvent(
-                addedEventDetails[0] + "-" +  // year
-                addedEventDetails[1] + "-" +  // month
-                addedEventDetails[2] + "T" +  // day
-                addedEventDetails[3] + ":00.000-00:00", // time
-                addedEventDetails[0] + "-" +  
-                addedEventDetails[1] + "-" + 
-                addedEventDetails[2] + "T" + 
-                addedEventDetails[3] + ":05.000-00:00",
-                addedEventDetails[4]   // details
-                );
+                  addedEventDetails[0] + "-" + // year
+                      addedEventDetails[1] + "-" + // month
+                      addedEventDetails[2] + "T" + // day
+                      addedEventDetails[3] + ":00.000-00:00", // time
+                  addedEventDetails[0] + "-" +
+                      addedEventDetails[1] + "-" +
+                      addedEventDetails[2] + "T" +
+                      addedEventDetails[3] + ":05.000-00:00",
+                  addedEventDetails[4] // details
+              );
             }
           }
-
+          openCsvObj.writeToCsv(newEvents);
         }
+      }
+
+      // For when Calendar needs to be reset
+      else if (args[0].equals("Redo_All")) {
+        System.out.println("\n[] Deleting all calendar events...");
+        calobj.clearAllCalendarEvents();
+
+        ArrayList<String> allEvents = openCsvObj.readCsv();
+        System.out.println("\n[] Adding back all calendar events...");
+        for (String addedEvent : allEvents) {
+          String[] addedEventDetails = addedEvent.split("[,]");
+          if (addedEventDetails[5].equals("3")) {
+            calobj.addCalendarEvent(
+                addedEventDetails[0] + "-" + // year
+                    addedEventDetails[1] + "-" + // month
+                    addedEventDetails[2] + "T" + // day
+                    addedEventDetails[3] + ":00.000-00:00", // time
+                addedEventDetails[0] + "-" +
+                    addedEventDetails[1] + "-" +
+                    addedEventDetails[2] + "T" +
+                    addedEventDetails[3] + ":05.000-00:00",
+                addedEventDetails[4] // details
+            );
+          }
+        }
+      }
     } catch (IOException e) {
       e.printStackTrace();
     } catch (GeneralSecurityException f) {
       f.printStackTrace();
-    };
+    }
+    ;
     System.out.println("\n[] Ending...\n");
   }
 }
