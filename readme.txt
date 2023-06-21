@@ -11,3 +11,12 @@ mvn clean package -DskipTests
 
 java -cp target/my-app-1.0-SNAPSHOT.jar com.cowboychkn.tradingeconomics.RunUpdate;
 
+
+
+
+
+------
+Gripes to fix:
+
+- when making changes to DB files, in order to test, must run full update, which could potentially add unwanted events to Calendar 
+	- at the least, add: block if no file exists. 
